@@ -90,10 +90,31 @@ namespace LEDSegmentDisplay_Remote
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if(comboBox1.SelectedIndex==0)
+            AutoStart.Enabled = false;
+            AutoStop.Enabled = true;
+            if(comboBox1.SelectedIndex==0)//CPU占用
             { 
                 
             }
+            else if (comboBox1.SelectedIndex == 1)//已用内存
+            {
+
+            }
+            else if (comboBox1.SelectedIndex == 2)//剩余内存
+            {
+
+            }
+            else if (comboBox1.SelectedIndex == 3)//GPU占用
+            {
+
+            }
+            else if (comboBox1.SelectedIndex == 4)//时间
+            {
+
+            }
         }
+
+
+
     }
 }
