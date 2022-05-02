@@ -180,8 +180,8 @@
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Items.AddRange(new object[] {
             "CPU占用%",
-            "已用内存MB",
             "剩余内存MB",
+            "已用内存MB",
             "GPU占用%",
             "系统时间"});
             this.comboBox1.Location = new System.Drawing.Point(6, 22);
@@ -210,6 +210,7 @@
             this.AutoStop.TabIndex = 8;
             this.AutoStop.Text = "终止";
             this.AutoStop.UseVisualStyleBackColor = true;
+            this.AutoStop.Click += new System.EventHandler(this.AutoStop_Click);
             // 
             // Main
             // 
@@ -226,6 +227,7 @@
             this.Name = "Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "4位共阴数码管";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
             this.Load += new System.EventHandler(this.Main_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

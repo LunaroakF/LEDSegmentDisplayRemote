@@ -17,6 +17,7 @@ namespace LEDSegmentDisplay_Remote
 {
     public partial class Main : Form
     {
+        Socket PublicRemote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         public Main()
         {
             InitializeComponent();
@@ -37,11 +38,13 @@ namespace LEDSegmentDisplay_Remote
             {
                 button1.Enabled = false;
                 button1.Text = "处理中...";
-                Socket Remote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);//创建套接字，参数具体定义参考MSD;
+                PublicRemote.Close();
+                
+                PublicRemote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);//创建套接字，参数具体定义参考MSD;
                 IPEndPoint ipp = new IPEndPoint(IPAddress.Parse(Variables.IP), Variables.Port);//定义目标主机的IP,与端口
-                Remote.Connect(ipp);//连接目标主机（服务器）
-                Upload(CommandBox.Text, Remote);
-                Remote.Close();
+                PublicRemote.Connect(ipp);//连接目标主机（服务器）
+                Upload(CommandBox.Text, PublicRemote);
+                PublicRemote.Close();
             }
             catch {
                 button1.Text = "失败";
@@ -86,7 +89,7 @@ namespace LEDSegmentDisplay_Remote
 
         private void Main_Load(object sender, EventArgs e)
         {
-
+            
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -124,19 +127,10 @@ namespace LEDSegmentDisplay_Remote
             while (true)
             {
                 System.Threading.Thread.Sleep(1000);
-                PerformanceCounter cpuCounter;
                 PerformanceCounter ramCounter;
-
-                cpuCounter = new PerformanceCounter();
-                cpuCounter.CategoryName = "Processor";
-                cpuCounter.CounterName = "% Processor Time";
-                cpuCounter.InstanceName = "_Total";
-                cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
                 ramCounter = new PerformanceCounter("Memory", "Available MBytes");
 
 
-
-                Console.WriteLine("电脑CPU使用率：" + cpuCounter.NextValue() + "%");
                 Console.WriteLine("电脑可使用内存：" + ramCounter.NextValue() + "MB");
                 Console.WriteLine();
 
@@ -144,14 +138,71 @@ namespace LEDSegmentDisplay_Remote
         }
         public void RAMProcess()
         {
-            while (true)
+            PublicRemote.Close();
+            try
             {
-                PerformanceCounter ramCounter;
-                ramCounter = new PerformanceCounter("Memory", "Available MBytes");
-                int ram = (int)ramCounter.NextValue() / 1;
-
+                //创建套接字，参数具体定义参考MSD;
+                PublicRemote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                IPEndPoint ipp = new IPEndPoint(IPAddress.Parse(Variables.IP), Variables.Port);//定义目标主机的IP,与端口
+                PublicRemote.Connect(ipp);//连接目标主机（服务器）
+                
+                while (true)
+                {
+                    System.Threading.Thread.Sleep(50);
+                    PerformanceCounter ramCounter;
+                    ramCounter = new PerformanceCounter("Memory", "Available MBytes");
+                    
+                    int ram = (int)ramCounter.NextValue() / 1;
+                    Console.WriteLine(ram);
+                    Upload(ToCode(ram), PublicRemote);
+                }
+            }
+            catch
+            {
+                PublicRemote.Close();
             }
         }
 
+        public string ToCode(int number)
+        {
+            string numberstr = number.ToString();
+            string result = "8-8-8-8-0-0-0-0";
+            //Console.WriteLine(numberstr.Substring(0, 1));
+            if (numberstr.Length == 1)
+            {
+                result = "0-0-0-" + numberstr + "-0-0-0-0";
+            }
+            else if (numberstr.Length == 2)
+            {
+                result = "0-0-"+ numberstr.Substring(0, 1)+"-" 
+                    + numberstr.Substring(1, 1) + "-0-0-0-0";
+            }
+            else if (numberstr.Length == 3)
+            {
+                result = "0-"+ numberstr.Substring(0, 1) + "-"
+                    + numberstr.Substring(1, 1) + "-"
+                    + numberstr.Substring(2,1) + "-0-0-0-0";
+            }
+            else if (numberstr.Length == 4)
+            {
+                result = numberstr.Substring(0, 1)+ "-"
+                    + numberstr.Substring(1, 1) + "-"
+                    + numberstr.Substring(2, 1) + "-"
+                    + numberstr.Substring(3, 1) + "-0-0-0-0";
+            }
+            return result;
+        }
+
+        private void AutoStop_Click(object sender, EventArgs e)
+        {
+            AutoStart.Enabled = true;
+            AutoStop.Enabled = false;
+            PublicRemote.Close();
+        }
+
+        private void Main_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Environment.Exit(0);
+        }
     }
 }
