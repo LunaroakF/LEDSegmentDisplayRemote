@@ -28,6 +28,9 @@ namespace LEDSegmentDisplay_Remote
 
         private void button1_Click(object sender, EventArgs e)
         {
+            AutoStart.Enabled = true;
+            AutoStop.Enabled = false;
+            this.Text = "4位共阴数码管";
             Thread thread = new Thread(new ThreadStart(ButtonSend));
             thread.Start();
         }
@@ -116,13 +119,50 @@ namespace LEDSegmentDisplay_Remote
             }
             else if (comboBox1.SelectedIndex == 4)//时间
             {
-
+                Thread thread = new Thread(new ThreadStart(SystemTime));
+                thread.Start();
             }
         }
 
         //public PerformanceCounter CpuOccupied = new PerformanceCounter();
+        public void SystemTime()
+        {
+            PublicRemote.Close();
+            try
+            {
+                //创建套接字，参数具体定义参考MSD;
+                PublicRemote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                IPEndPoint ipp = new IPEndPoint(IPAddress.Parse(Variables.IP), Variables.Port);//定义目标主机的IP,与端口
+                PublicRemote.Connect(ipp);//连接目标主机（服务器）
+                int dottime=0;
+                int dot = 0;
+                while (true)
+                {
+                    System.Threading.Thread.Sleep(50);
+                    dottime = dottime + 50;
+                    string date = DateTime.Now.ToLocalTime().ToString("HH:mm");
+                    string[] a = date.Split(':');
+                    int time= int.Parse(a[0]+a[1]);
+                    if (dottime >= 500)
+                    {
+                        dottime = 0;
+                        if (dot == 0)
+                            dot = 2;
+                        else
+                            dot = 0;
+                    }
+                    Upload(ToCode(time,dot), PublicRemote);
+                }
+            }
+            catch
+            {
+                PublicRemote.Close();
+                this.Text = "4位共阴数码管";
+            }
+        }
 
-        public void CPUProcess()
+
+            public void CPUProcess()
         {
             while (true)
             {
@@ -154,42 +194,60 @@ namespace LEDSegmentDisplay_Remote
                     
                     int ram = (int)ramCounter.NextValue() / 1;
                     Console.WriteLine(ram);
-                    Upload(ToCode(ram), PublicRemote);
+                    Upload(ToCode(ram,0), PublicRemote);
                 }
             }
             catch
             {
                 PublicRemote.Close();
+                this.Text = "4位共阴数码管";
             }
         }
 
-        public string ToCode(int number)
+        public string ToCode(int number,int dot)
         {
-            string numberstr = number.ToString();
+            string tail="0-0-0-0";
+            if (dot == 1) tail = "1-0-0-0";
+            else if (dot == 2) tail = "0-1-0-0";
+            else if (dot == 3) tail = "0-0-1-0";
+            else if (dot == 4) tail = "0-0-0-1";
+            else if (dot == 12) tail = "1-1-0-0";
+            else if (dot == 13) tail = "1-0-1-0";
+            else if (dot == 14) tail = "1-0-0-1";
+            else if (dot == 23) tail = "0-1-1-0";
+            else if (dot == 24) tail = "0-1-0-1";
+            else if (dot == 34) tail = "0-0-1-1";
+            else if (dot == 123) tail = "1-1-1-0";
+            else if (dot == 124) tail = "1-1-0-1";
+            else if (dot == 134) tail = "1-0-1-1";
+            else if (dot == 1234) tail = "1-1-1-1";
+
+                string numberstr = number.ToString();
             string result = "8-8-8-8-0-0-0-0";
             //Console.WriteLine(numberstr.Substring(0, 1));
             if (numberstr.Length == 1)
             {
-                result = "0-0-0-" + numberstr + "-0-0-0-0";
+                result = "0-0-0-" + numberstr + "-"+tail;
             }
             else if (numberstr.Length == 2)
             {
                 result = "0-0-"+ numberstr.Substring(0, 1)+"-" 
-                    + numberstr.Substring(1, 1) + "-0-0-0-0";
+                    + numberstr.Substring(1, 1) +"-" +tail;
             }
             else if (numberstr.Length == 3)
             {
                 result = "0-"+ numberstr.Substring(0, 1) + "-"
                     + numberstr.Substring(1, 1) + "-"
-                    + numberstr.Substring(2,1) + "-0-0-0-0";
+                    + numberstr.Substring(2,1) +"-"+ tail;
             }
             else if (numberstr.Length == 4)
             {
                 result = numberstr.Substring(0, 1)+ "-"
                     + numberstr.Substring(1, 1) + "-"
                     + numberstr.Substring(2, 1) + "-"
-                    + numberstr.Substring(3, 1) + "-0-0-0-0";
+                    + numberstr.Substring(3, 1) +"-"+ tail;
             }
+            this.Text = "4位共阴数码管" + " " + result;
             return result;
         }
 
@@ -198,6 +256,7 @@ namespace LEDSegmentDisplay_Remote
             AutoStart.Enabled = true;
             AutoStop.Enabled = false;
             PublicRemote.Close();
+            this.Text = "4位共阴数码管";
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
