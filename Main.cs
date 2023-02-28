@@ -33,6 +33,7 @@ namespace LEDSegmentDisplay_Remote
             this.Text = "4位共阴数码管";
             Thread thread = new Thread(new ThreadStart(ButtonSend));
             thread.Start();
+            
         }
 
         public void ButtonSend()
@@ -42,7 +43,7 @@ namespace LEDSegmentDisplay_Remote
                 button1.Enabled = false;
                 button1.Text = "处理中...";
                 PublicRemote.Close();
-                
+                System.Threading.Thread.Sleep(100);
                 PublicRemote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);//创建套接字，参数具体定义参考MSD;
                 IPEndPoint ipp = new IPEndPoint(IPAddress.Parse(Variables.IP), Variables.Port);//定义目标主机的IP,与端口
                 PublicRemote.Connect(ipp);//连接目标主机（服务器）
@@ -51,7 +52,7 @@ namespace LEDSegmentDisplay_Remote
             }
             catch {
                 button1.Text = "失败";
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(500);
             }
             button1.Enabled = true;
             button1.Text = "发送";

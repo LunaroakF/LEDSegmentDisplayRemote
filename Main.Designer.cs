@@ -40,9 +40,9 @@
             this.label3 = new System.Windows.Forms.Label();
             this.CommandBox = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.AutoStart = new System.Windows.Forms.Button();
             this.AutoStop = new System.Windows.Forms.Button();
+            this.AutoStart = new System.Windows.Forms.Button();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -78,7 +78,7 @@
             this.PortBox.Name = "PortBox";
             this.PortBox.Size = new System.Drawing.Size(176, 23);
             this.PortBox.TabIndex = 2;
-            this.PortBox.Text = "23333";
+            this.PortBox.Text = "2000";
             this.PortBox.TextChanged += new System.EventHandler(this.PortBox_TextChanged);
             this.PortBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.PortBox_KeyPress);
             // 
@@ -97,7 +97,7 @@
             this.IPBox.Name = "IPBox";
             this.IPBox.Size = new System.Drawing.Size(176, 23);
             this.IPBox.TabIndex = 900;
-            this.IPBox.Text = "192.168.0.114";
+            this.IPBox.Text = "192.168.0.121";
             this.IPBox.TextChanged += new System.EventHandler(this.IPBox_TextChanged);
             // 
             // groupBox2
@@ -173,6 +173,28 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "自动操作";
             // 
+            // AutoStop
+            // 
+            this.AutoStop.Enabled = false;
+            this.AutoStop.ForeColor = System.Drawing.Color.Red;
+            this.AutoStop.Location = new System.Drawing.Point(6, 107);
+            this.AutoStop.Name = "AutoStop";
+            this.AutoStop.Size = new System.Drawing.Size(67, 27);
+            this.AutoStop.TabIndex = 8;
+            this.AutoStop.Text = "终止";
+            this.AutoStop.UseVisualStyleBackColor = true;
+            this.AutoStop.Click += new System.EventHandler(this.AutoStop_Click);
+            // 
+            // AutoStart
+            // 
+            this.AutoStart.Location = new System.Drawing.Point(167, 105);
+            this.AutoStart.Name = "AutoStart";
+            this.AutoStart.Size = new System.Drawing.Size(67, 27);
+            this.AutoStart.TabIndex = 7;
+            this.AutoStart.Text = "开始";
+            this.AutoStart.UseVisualStyleBackColor = true;
+            this.AutoStart.Click += new System.EventHandler(this.button2_Click);
+            // 
             // comboBox1
             // 
             this.comboBox1.DisplayMember = "1";
@@ -189,28 +211,6 @@
             this.comboBox1.Size = new System.Drawing.Size(139, 25);
             this.comboBox1.TabIndex = 0;
             this.comboBox1.ValueMember = "1";
-            // 
-            // AutoStart
-            // 
-            this.AutoStart.Location = new System.Drawing.Point(167, 105);
-            this.AutoStart.Name = "AutoStart";
-            this.AutoStart.Size = new System.Drawing.Size(67, 27);
-            this.AutoStart.TabIndex = 7;
-            this.AutoStart.Text = "开始";
-            this.AutoStart.UseVisualStyleBackColor = true;
-            this.AutoStart.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // AutoStop
-            // 
-            this.AutoStop.Enabled = false;
-            this.AutoStop.ForeColor = System.Drawing.Color.Red;
-            this.AutoStop.Location = new System.Drawing.Point(6, 107);
-            this.AutoStop.Name = "AutoStop";
-            this.AutoStop.Size = new System.Drawing.Size(67, 27);
-            this.AutoStop.TabIndex = 8;
-            this.AutoStop.Text = "终止";
-            this.AutoStop.UseVisualStyleBackColor = true;
-            this.AutoStop.Click += new System.EventHandler(this.AutoStop_Click);
             // 
             // Main
             // 
