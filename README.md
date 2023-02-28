@@ -1,5 +1,5 @@
 # LEDSegmentDisplayRemote
-一个通过Windows控制树莓派PicoW显示4位小数点数码管的东西
+一个通过Windows无线局域网控制树莓派PicoW显示4位小数点数码管的东西
 
 ## 4位数码管引脚图(12针脚)  
 ![Image text](https://github.com/LunaroakF/LEDSegmentDisplayRemote/blob/master/pic.png)  
