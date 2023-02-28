@@ -39,7 +39,7 @@ com4 = Pin(c_com4, Pin.OUT)
 
 LED.value(1)
 #print("链接WIFI...")
-WIFIConnect.ConnectWIFI('LunaroakF','19645277')
+WIFIConnect.ConnectWIFI('LunaroakF','12345678')
 LED.value(0)
 
 N1=0
