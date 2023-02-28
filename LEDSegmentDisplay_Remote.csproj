@@ -87,6 +87,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="pic.png" />
     <Content Include="RaspberryPi_Pico_W\main.py" />
     <Content Include="RaspberryPi_Pico_W\WIFIConnect.py" />
   </ItemGroup>
