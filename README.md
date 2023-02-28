@@ -1,0 +1,3 @@
+# LEDSegmentDisplayRemote
+一个通过Windows控制树莓派PicoW显示4位小数点数码管的东西
+
