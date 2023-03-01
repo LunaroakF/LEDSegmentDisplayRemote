@@ -170,6 +170,18 @@ def ToNum9(dot):
     if dot:
         dp.value(1)
         
+def ToNumB(dot):
+    a.value(0)
+    b.value(0)
+    c.value(0)
+    d.value(0)
+    e.value(0)
+    f.value(0)
+    g.value(0)
+    dp.value(0)
+    if dot:
+        dp.value(1)
+        
 def ToErr1():
     a.value(1)
     e.value(1)
@@ -218,6 +230,8 @@ def JugeNumber(number,dot):
         ToNum8(dot)
     elif number==9:
         ToNum9(dot)
+    elif number==10:
+        ToNumB(dot)
     elif number==6666:
         ToErr1()
     elif number==7777:
@@ -312,10 +326,27 @@ def Wificl():
                     maindata=datalist[1]
                     #print("用户数据:"+maindata)
                     group=maindata.split("-")
-                    N1=int(group[0])
-                    N2=int(group[1])
-                    N3=int(group[2])
-                    N4=int(group[3])
+                    
+                    if(group[0]!="B"):
+                        N1=int(group[0])
+                    else:
+                        N1=10
+                        
+                    if(group[1]!="B"):
+                        N2=int(group[1])
+                    else:
+                        N2=10
+                        
+                    if(group[2]!="B"):
+                        N3=int(group[2])
+                    else:
+                        N3=10
+                    
+                    if(group[3]!="B"):
+                        N4=int(group[3])
+                    else:
+                        N4=10
+                    
                     if group[4]=="1":
                         D1=True
                     else:

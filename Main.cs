@@ -152,7 +152,7 @@ namespace LEDSegmentDisplay_Remote
                         else
                             dot = 0;
                     }
-                    Upload(ToCode(time,dot), PublicRemote);
+                    Upload(ToCode(time,dot,false), PublicRemote);
                 }
             }
             catch
@@ -165,16 +165,29 @@ namespace LEDSegmentDisplay_Remote
 
             public void CPUProcess()
         {
-            while (true)
+            PublicRemote.Close();
+            try
             {
-                System.Threading.Thread.Sleep(1000);
-                PerformanceCounter ramCounter;
-                ramCounter = new PerformanceCounter("Memory", "Available MBytes");
+                //连接目标
+                PublicRemote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                IPEndPoint ipp = new IPEndPoint(IPAddress.Parse(Variables.IP), Variables.Port);
+                PublicRemote.Connect(ipp);
 
+                //初始化CPU计数器
+                PerformanceCounter cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
 
-                Console.WriteLine("电脑可使用内存：" + ramCounter.NextValue() + "MB");
-                Console.WriteLine();
-
+                while (true)
+                {
+                    System.Threading.Thread.Sleep(500);
+                    int cpu = (int)cpuCounter.NextValue();
+                    Console.WriteLine(cpu);
+                    Upload(ToCode(cpu, 0,true), PublicRemote);
+                }
+            }
+            catch
+            {
+                PublicRemote.Close();
+                this.Text = "4位共阴数码管";
             }
         }
         public void RAMProcess()
@@ -182,20 +195,20 @@ namespace LEDSegmentDisplay_Remote
             PublicRemote.Close();
             try
             {
-                //创建套接字，参数具体定义参考MSD;
+                //连接目标
                 PublicRemote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                IPEndPoint ipp = new IPEndPoint(IPAddress.Parse(Variables.IP), Variables.Port);//定义目标主机的IP,与端口
-                PublicRemote.Connect(ipp);//连接目标主机（服务器）
-                
+                IPEndPoint ipp = new IPEndPoint(IPAddress.Parse(Variables.IP), Variables.Port);
+                PublicRemote.Connect(ipp);
+
+                //初始化内存计数器
+                PerformanceCounter ramCounter = new PerformanceCounter("Memory", "Available MBytes");
+
                 while (true)
                 {
                     System.Threading.Thread.Sleep(50);
-                    PerformanceCounter ramCounter;
-                    ramCounter = new PerformanceCounter("Memory", "Available MBytes");
-                    
                     int ram = (int)ramCounter.NextValue() / 1;
                     Console.WriteLine(ram);
-                    Upload(ToCode(ram,0), PublicRemote);
+                    Upload(ToCode(ram,0,false), PublicRemote);
                 }
             }
             catch
@@ -205,7 +218,7 @@ namespace LEDSegmentDisplay_Remote
             }
         }
 
-        public string ToCode(int number,int dot)
+        public string ToCode(int number,int dot,bool ifclean)
         {
             string tail="0-0-0-0";
             if (dot == 1) tail = "1-0-0-0";
@@ -226,28 +239,58 @@ namespace LEDSegmentDisplay_Remote
                 string numberstr = number.ToString();
             string result = "8-8-8-8-0-0-0-0";
             //Console.WriteLine(numberstr.Substring(0, 1));
-            if (numberstr.Length == 1)
+
+            if (!ifclean)
             {
-                result = "0-0-0-" + numberstr + "-"+tail;
+                if (numberstr.Length == 1)
+                {
+                    result = "0-0-0-" + numberstr + "-" + tail;
+                }
+                else if (numberstr.Length == 2)
+                {
+                    result = "0-0-" + numberstr.Substring(0, 1) + "-"
+                        + numberstr.Substring(1, 1) + "-" + tail;
+                }
+                else if (numberstr.Length == 3)
+                {
+                    result = "0-" + numberstr.Substring(0, 1) + "-"
+                        + numberstr.Substring(1, 1) + "-"
+                        + numberstr.Substring(2, 1) + "-" + tail;
+                }
+                else if (numberstr.Length == 4)
+                {
+                    result = numberstr.Substring(0, 1) + "-"
+                        + numberstr.Substring(1, 1) + "-"
+                        + numberstr.Substring(2, 1) + "-"
+                        + numberstr.Substring(3, 1) + "-" + tail;
+                }
             }
-            else if (numberstr.Length == 2)
+            else 
             {
-                result = "0-0-"+ numberstr.Substring(0, 1)+"-" 
-                    + numberstr.Substring(1, 1) +"-" +tail;
+                if (numberstr.Length == 1)
+                {
+                    result = "B-B-B-" + numberstr + "-" + tail;
+                }
+                else if (numberstr.Length == 2)
+                {
+                    result = "B-B-" + numberstr.Substring(0, 1) + "-"
+                        + numberstr.Substring(1, 1) + "-" + tail;
+                }
+                else if (numberstr.Length == 3)
+                {
+                    result = "B-" + numberstr.Substring(0, 1) + "-"
+                        + numberstr.Substring(1, 1) + "-"
+                        + numberstr.Substring(2, 1) + "-" + tail;
+                }
+                else if (numberstr.Length == 4)
+                {
+                    result = numberstr.Substring(0, 1) + "-"
+                        + numberstr.Substring(1, 1) + "-"
+                        + numberstr.Substring(2, 1) + "-"
+                        + numberstr.Substring(3, 1) + "-" + tail;
+                }
             }
-            else if (numberstr.Length == 3)
-            {
-                result = "0-"+ numberstr.Substring(0, 1) + "-"
-                    + numberstr.Substring(1, 1) + "-"
-                    + numberstr.Substring(2,1) +"-"+ tail;
-            }
-            else if (numberstr.Length == 4)
-            {
-                result = numberstr.Substring(0, 1)+ "-"
-                    + numberstr.Substring(1, 1) + "-"
-                    + numberstr.Substring(2, 1) + "-"
-                    + numberstr.Substring(3, 1) +"-"+ tail;
-            }
+
             this.Text = "4位共阴数码管" + " " + result;
             return result;
         }

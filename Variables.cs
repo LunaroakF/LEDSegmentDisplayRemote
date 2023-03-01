@@ -8,7 +8,7 @@ namespace LEDSegmentDisplay_Remote
 {
     internal class Variables
     {
-        public static string IP = "192.168.0.114";
-        public static int Port = 23333;
+        public static string IP = "192.168.0.121";
+        public static int Port = 2000;
     }
 }
