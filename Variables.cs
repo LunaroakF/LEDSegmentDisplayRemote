@@ -10,5 +10,6 @@ namespace LEDSegmentDisplay_Remote
     {
         public static string IP = "192.168.0.121";
         public static int Port = 2000;
+        public static bool AutoFillZero = true;
     }
 }

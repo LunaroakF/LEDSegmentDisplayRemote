@@ -43,6 +43,7 @@
             this.AutoStop = new System.Windows.Forms.Button();
             this.AutoStart = new System.Windows.Forms.Button();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -163,6 +164,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.checkBox1);
             this.groupBox3.Controls.Add(this.AutoStop);
             this.groupBox3.Controls.Add(this.AutoStart);
             this.groupBox3.Controls.Add(this.comboBox1);
@@ -212,6 +214,19 @@
             this.comboBox1.TabIndex = 0;
             this.comboBox1.ValueMember = "1";
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox1.Location = new System.Drawing.Point(6, 53);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(106, 21);
+            this.checkBox1.TabIndex = 9;
+            this.checkBox1.Text = "自动填充数字0";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
@@ -234,6 +249,7 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -255,6 +271,7 @@
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.Button AutoStop;
         private System.Windows.Forms.Button AutoStart;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 
