@@ -10,8 +10,10 @@ using System.Windows.Forms;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
-
+using Microsoft.VisualBasic;
 using System.Diagnostics;
+using System.Xml.Linq;
+using System.Runtime.InteropServices;
 
 namespace LEDSegmentDisplay_Remote
 {
@@ -22,53 +24,45 @@ namespace LEDSegmentDisplay_Remote
         {
             InitializeComponent();
             comboBox1.SelectedIndex = 0;
-            //跨线程调用窗体组件无视警告
-            System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
+            System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;//跨线程调用窗体组件无视警告
         }
-
         private void button1_Click(object sender, EventArgs e)
         {
             AutoStart.Enabled = true;
             AutoStop.Enabled = false;
-            this.Text = "4位共阴数码管";
+            this.Text = Variables.Text_Title;
             Thread thread = new Thread(new ThreadStart(ButtonSend));
             thread.Start();
-            
         }
-
         public void ButtonSend()
         {
             try
             {
                 button1.Enabled = false;
-                button1.Text = "处理中...";
-                PublicRemote.Close();
+                button1.Text = Variables.Text_PleaseWait;
                 System.Threading.Thread.Sleep(100);
-                PublicRemote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);//创建套接字，参数具体定义参考MSD;
-                IPEndPoint ipp = new IPEndPoint(IPAddress.Parse(Variables.IP), Variables.Port);//定义目标主机的IP,与端口
-                PublicRemote.Connect(ipp);//连接目标主机（服务器）
+                ConnectItem();
                 Upload(CommandBox.Text, PublicRemote);
+                button1.Text = Variables.Text_Done;
+                System.Threading.Thread.Sleep(2000);
                 PublicRemote.Close();
             }
             catch {
-                button1.Text = "失败";
+                button1.Text = Variables.Text_Fail;
                 System.Threading.Thread.Sleep(500);
             }
             button1.Enabled = true;
-            button1.Text = "发送";
+            button1.Text = Variables.Text_Sent;
         }
-
         public void Upload(string message,Socket Remote)
         {
             Remote.Send(Tobt(message));//向目标机发送消息
         }
-
         static byte[] Tobt(string mgs)
         {
             byte[] cmgs = Encoding.UTF8.GetBytes(mgs);
             return cmgs;
         }
-
         private void PortBox_TextChanged(object sender, EventArgs e)
         {
             try
@@ -77,7 +71,6 @@ namespace LEDSegmentDisplay_Remote
             }
             catch { }
         }
-
         private void PortBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!(Char.IsNumber(e.KeyChar)) && e.KeyChar != (char)8)
@@ -85,22 +78,20 @@ namespace LEDSegmentDisplay_Remote
                 e.Handled = true;
             }
         }
-
         private void IPBox_TextChanged(object sender, EventArgs e)
         {
             Variables.IP = IPBox.Text;
         }
-
         private void Main_Load(object sender, EventArgs e)
         {
             
         }
-
         private void button2_Click(object sender, EventArgs e)
         {
             AutoStart.Enabled = false;
+            AutoStart.Text = Variables.Text_PleaseWait;
             AutoStop.Enabled = true;
-            if(comboBox1.SelectedIndex==0)//CPU占用
+            if (comboBox1.SelectedIndex == 0)//CPU占用
             {
                 Thread thread = new Thread(new ThreadStart(CPUCountProcess));
                 thread.Start();
@@ -113,32 +104,33 @@ namespace LEDSegmentDisplay_Remote
             else if (comboBox1.SelectedIndex == 2)//已用内存
             {
                 Thread thread = new Thread(new ThreadStart(RAMUsedProcess));
-                //thread.Start();
+                thread.Start();
             }
-            else if (comboBox1.SelectedIndex == 3)//GPU占用
+            else if (comboBox1.SelectedIndex == 3)//GPU内存
             {
-
+                Thread thread = new Thread(new ThreadStart(GPURAMRemainProcess));
+                thread.Start();
             }
             else if (comboBox1.SelectedIndex == 4)//时间
             {
                 Thread thread = new Thread(new ThreadStart(SystemTime));
                 thread.Start();
             }
+            else if (comboBox1.SelectedIndex == 5)//下行网速
+            {
+                Thread thread = new Thread(new ThreadStart(DownloadSpeedProcess));
+                thread.Start();
+            }
         }
-
-        //public PerformanceCounter CpuOccupied = new PerformanceCounter();
         public void SystemTime()
         {
-            PublicRemote.Close();
             try
             {
-                //连接目标
-                PublicRemote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                IPEndPoint ipp = new IPEndPoint(IPAddress.Parse(Variables.IP), Variables.Port);
-                PublicRemote.Connect(ipp);
+                ConnectItem();
 
                 int dottime=0;
                 int dot = 0;
+                AutoStart.Text = Variables.Text_Begin;
 
                 while (true)
                 {
@@ -162,23 +154,19 @@ namespace LEDSegmentDisplay_Remote
             catch
             {
                 PublicRemote.Close();
-                this.Text = "4位共阴数码管";
+                this.Text = Variables.Text_Title;
             }
         }
-
-
-            public void CPUCountProcess()
+        public void CPUCountProcess()
         {
-            PublicRemote.Close();
             try
             {
-                //连接目标
-                PublicRemote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                IPEndPoint ipp = new IPEndPoint(IPAddress.Parse(Variables.IP), Variables.Port);
-                PublicRemote.Connect(ipp);
+                ConnectItem();
 
                 //初始化CPU计数器
                 PerformanceCounter cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+
+                AutoStart.Text = Variables.Text_Begin;
 
                 while (true)
                 {
@@ -191,26 +179,24 @@ namespace LEDSegmentDisplay_Remote
             catch
             {
                 PublicRemote.Close();
-                this.Text = "4位共阴数码管";
+                this.Text = Variables.Text_Title;
             }
         }
         public void RAMRemainProcess()
         {
-            PublicRemote.Close();
             try
             {
-                //连接目标
-                PublicRemote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                IPEndPoint ipp = new IPEndPoint(IPAddress.Parse(Variables.IP), Variables.Port);
-                PublicRemote.Connect(ipp);
+                ConnectItem();
 
                 //初始化内存计数器
                 PerformanceCounter ramCounter = new PerformanceCounter("Memory", "Available MBytes");
 
+                AutoStart.Text = Variables.Text_Begin;
+
                 while (true)
                 {
                     System.Threading.Thread.Sleep(50);
-                    int ram = (int)ramCounter.NextValue() / 1;
+                    int ram = (int)ramCounter.NextValue();
                     Console.WriteLine(ram);
                     Upload(ToCode(ram,0, Variables.AutoFillZero), PublicRemote);
                 }
@@ -218,27 +204,24 @@ namespace LEDSegmentDisplay_Remote
             catch
             {
                 PublicRemote.Close();
-                this.Text = "4位共阴数码管";
+                this.Text = Variables.Text_Title;
             }
         }
-
         public void RAMUsedProcess()
         {
-            PublicRemote.Close();
             try
             {
-                //连接目标
-                PublicRemote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                IPEndPoint ipp = new IPEndPoint(IPAddress.Parse(Variables.IP), Variables.Port);
-                PublicRemote.Connect(ipp);
+                ConnectItem();
 
                 //初始化内存计数器
-                PerformanceCounter ramCounter = new PerformanceCounter("Memory", "Committed MBytes");
+                PerformanceCounter ramCounter = new PerformanceCounter("Memory", "Available MBytes");
+                int TotalRAM = (int)PerformanceInfo.GetTotalMemoryInMiB();
+                AutoStart.Text = Variables.Text_Begin;
 
                 while (true)
                 {
                     System.Threading.Thread.Sleep(50);
-                    int ram = (int)ramCounter.NextValue() / 1;
+                    int ram = TotalRAM- (int)ramCounter.NextValue();
                     Console.WriteLine(ram);
                     Upload(ToCode(ram, 0, Variables.AutoFillZero), PublicRemote);
                 }
@@ -246,10 +229,69 @@ namespace LEDSegmentDisplay_Remote
             catch
             {
                 PublicRemote.Close();
-                this.Text = "4位共阴数码管";
+                this.Text = Variables.Text_Title;
             }
         }
+        public void GPURAMRemainProcess()
+        {
+            try
+            {
+                ConnectItem();
 
+                //
+
+                while (true)
+                {
+                    System.Threading.Thread.Sleep(50);
+                    //
+                    //Console.WriteLine(GPURAM);
+                    //Upload(ToCode(GPURAM, 0, Variables.AutoFillZero), PublicRemote);
+                }
+            }
+            catch
+            {
+                PublicRemote.Close();
+                this.Text = Variables.Text_Title;
+            }
+        }
+        public void DownloadSpeedProcess()
+        {
+            Console.WriteLine("1");
+            PublicRemote.Close();
+            try
+            {
+                //连接目标
+                PublicRemote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                IPEndPoint ipp = new IPEndPoint(IPAddress.Parse(Variables.IP), Variables.Port);
+                PublicRemote.Connect(ipp);
+                Console.WriteLine("2");
+                //初始化下行网速计数器
+                PerformanceCounter downloadCounter = new PerformanceCounter("Network Interface", "Bytes Received/sec");
+                PerformanceCounter NetworkDownSpe = new PerformanceCounter("Network Interface", "Bytes Received/sec");
+                //PerformanceCounter pc2 = new PerformanceCounter("Network Interface", "Bytes Sent/sec");
+                Console.WriteLine("3");
+                while (true)
+                {
+                    System.Threading.Thread.Sleep(500);
+                    Console.WriteLine(downloadCounter.NextValue().ToString());
+                    int down = (int)downloadCounter.NextValue();
+                    Console.WriteLine(down);
+                    Upload(ToCode(down, 0, Variables.AutoFillZero), PublicRemote);
+                }
+            }
+            catch
+            {
+                PublicRemote.Close();
+                this.Text = Variables.Text_Title;
+            }
+        }
+        public void ConnectItem()//连接目标
+        {
+            PublicRemote.Close();
+            PublicRemote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            IPEndPoint ipp = new IPEndPoint(IPAddress.Parse(Variables.IP), Variables.Port);
+            PublicRemote.Connect(ipp);
+        }
         public string ToCode(int number,int dot,bool autofill)
         {
             string tail="0-0-0-0";
@@ -269,7 +311,7 @@ namespace LEDSegmentDisplay_Remote
             else if (dot == 1234) tail = "1-1-1-1";
 
                 string numberstr = number.ToString();
-            string result = "8-8-8-8-0-0-0-0";
+            string result = Variables.Data_OverStep;
             //Console.WriteLine(numberstr.Substring(0, 1));
 
             if (autofill)
@@ -323,29 +365,65 @@ namespace LEDSegmentDisplay_Remote
                 }
             }
 
-            this.Text = "4位共阴数码管" + " " + result;
+            this.Text = Variables.Text_Title + " " + result;
             return result;
         }
-
         private void AutoStop_Click(object sender, EventArgs e)
         {
             AutoStart.Enabled = true;
             AutoStop.Enabled = false;
             PublicRemote.Close();
-            this.Text = "4位共阴数码管";
+            this.Text = Variables.Text_Title;
         }
-
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
             Environment.Exit(0);
         }
-
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBox1.Checked)
                 Variables.AutoFillZero = true;
             else
                 Variables.AutoFillZero = false;
+        }
+    }
+    public static class PerformanceInfo
+    {
+        [DllImport("psapi.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetPerformanceInfo([Out] out PerformanceInformation PerformanceInformation, [In] int Size);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct PerformanceInformation
+        {
+            public int Size;
+            public IntPtr CommitTotal;
+            public IntPtr CommitLimit;
+            public IntPtr CommitPeak;
+            public IntPtr PhysicalTotal;
+            public IntPtr PhysicalAvailable;
+            public IntPtr SystemCache;
+            public IntPtr KernelTotal;
+            public IntPtr KernelPaged;
+            public IntPtr KernelNonPaged;
+            public IntPtr PageSize;
+            public int HandlesCount;
+            public int ProcessCount;
+            public int ThreadCount;
+        }
+
+        public static Int64 GetTotalMemoryInMiB()
+        {
+            PerformanceInformation pi = new PerformanceInformation();
+            if (GetPerformanceInfo(out pi, Marshal.SizeOf(pi)))
+            {
+                return Convert.ToInt64((pi.PhysicalTotal.ToInt64() * pi.PageSize.ToInt64() / 1048576));
+            }
+            else
+            {
+                return -1;
+            }
+
         }
     }
 }

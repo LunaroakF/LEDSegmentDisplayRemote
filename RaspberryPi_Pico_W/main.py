@@ -39,7 +39,7 @@ com4 = Pin(c_com4, Pin.OUT)
 
 LED.value(1)
 #print("链接WIFI...")
-WIFIConnect.ConnectWIFI('LunaroakF','12345678')
+WIFIConnect.ConnectWIFI('LunaroakF','19645277')
 LED.value(0)
 
 N1=0
@@ -206,7 +206,11 @@ def ToErr4():
     f.value(1)
     dp.value(1)
     
-        
+def ToErrF(dot):
+    g.value(1)
+    if dot:
+        dp.value(1)
+    
 ###########################################
 def JugeNumber(number,dot):
     offall()
@@ -232,6 +236,8 @@ def JugeNumber(number,dot):
         ToNum9(dot)
     elif number==10:
         ToNumB(dot)
+    elif number==11:
+        ToErrF(dot)
     elif number==6666:
         ToErr1()
     elif number==7777:
@@ -240,6 +246,7 @@ def JugeNumber(number,dot):
         ToErr3()
     elif number==9999:
         ToErr4()
+    
 
 def DisplayCom1(number,dot):
     JugeNumber(number,dot)       
@@ -327,26 +334,36 @@ def Wificl():
                     #print("用户数据:"+maindata)
                     group=maindata.split("-")
                     
-                    if(group[0]!="B"):
+                    #填充空白
+                    if(group[0]!="B" and group[0]!="F"):
                         N1=int(group[0])
                     else:
                         N1=10
                         
-                    if(group[1]!="B"):
+                    if(group[1]!="B" and group[1]!="F"):
                         N2=int(group[1])
                     else:
                         N2=10
                         
-                    if(group[2]!="B"):
+                    if(group[2]!="B" and group[2]!="F"):
                         N3=int(group[2])
                     else:
                         N3=10
                     
-                    if(group[3]!="B"):
+                    if(group[3]!="B" and group[3]!="F"):
                         N4=int(group[3])
                     else:
                         N4=10
-                    
+                    #负号
+                    if(group[0]=="F"):
+                        N1=11  
+                    if(group[1]=="F"):
+                        N2=11
+                    if(group[2]=="F"):
+                        N3=11
+                    if(group[3]=="F"):
+                        N4=11
+                    #小数点
                     if group[4]=="1":
                         D1=True
                     else:

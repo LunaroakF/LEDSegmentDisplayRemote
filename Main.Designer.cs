@@ -40,10 +40,10 @@
             this.label3 = new System.Windows.Forms.Label();
             this.CommandBox = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.AutoStop = new System.Windows.Forms.Button();
             this.AutoStart = new System.Windows.Forms.Button();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -175,6 +175,19 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "自动操作";
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox1.Location = new System.Drawing.Point(6, 53);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(106, 21);
+            this.checkBox1.TabIndex = 9;
+            this.checkBox1.Text = "自动填充数字0";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
             // AutoStop
             // 
             this.AutoStop.Enabled = false;
@@ -206,26 +219,14 @@
             "CPU占用%",
             "剩余内存MB",
             "已用内存MB",
-            "GPU占用%",
-            "系统时间"});
+            "GPU内存MB",
+            "系统时间",
+            "下行网速MB/s"});
             this.comboBox1.Location = new System.Drawing.Point(6, 22);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(139, 25);
             this.comboBox1.TabIndex = 0;
             this.comboBox1.ValueMember = "1";
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Checked = true;
-            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Location = new System.Drawing.Point(6, 53);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(106, 21);
-            this.checkBox1.TabIndex = 9;
-            this.checkBox1.Text = "自动填充数字0";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // Main
             // 
