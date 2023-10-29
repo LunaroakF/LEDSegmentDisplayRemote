@@ -82,14 +82,15 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="RaspberryPi_Pico_W\图纸.fzz" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="pic.png" />
     <Content Include="RaspberryPi_Pico_W\main.py" />
     <Content Include="RaspberryPi_Pico_W\WIFIConnect.py" />
+    <Content Include="RaspberryPi_Pico_W\pic.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
